@@ -11,4 +11,11 @@ object ReadInTestData {
     puzzleAsList
   }
 
+  def getPuzzleInputAsVector[T](transform: String => T)(filename: String): Vector[T] = {
+    val bufferedSource: BufferedSource = Source.fromFile(filename)
+    val puzzleAsList: Vector[T] = bufferedSource.getLines.toVector.map(transform)
+    bufferedSource.close
+    puzzleAsList
+  }
+
 }
