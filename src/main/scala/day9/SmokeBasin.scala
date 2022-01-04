@@ -1,40 +1,33 @@
 package day9
 
+import utils.PointWithHeight
+
 import scala.annotation.tailrec
-import scala.util.Try
 
 object SmokeBasin {
 
-  case class Point(x: Int, y: Int, height: Int)
+  def isLowPoint(input: Vector[Vector[PointWithHeight]], p: PointWithHeight): Boolean =
+    !p.getAdjacents(input).exists(_.height <= p.height)
 
-  def getAdjacents(input: Vector[Vector[Point]], point: Point): Set[Point] =
-    Set(Try(input(point.x - 1)(point.y)).toOption,
-      Try(input(point.x + 1)(point.y)).toOption,
-      Try(input(point.x)(point.y - 1)).toOption,
-      Try(input(point.x)(point.y + 1)).toOption).flatten
-
-  def isLowPoint(input: Vector[Vector[Point]], p: Point): Boolean =
-    !getAdjacents(input, p).exists(_.height <= p.height)
-
-  def getLowPoints(input: Vector[Vector[Point]]): Vector[Point] =
+  def getLowPoints(input: Vector[Vector[PointWithHeight]]): Vector[PointWithHeight] =
     input.flatten.filter(isLowPoint(input, _))
 
-  def getRisk(points: Vector[Point]): Int =
+  def getRisk(points: Vector[PointWithHeight]): Int =
     points.map(x => x.height+1).sum
 
-  def getBasin(input: Vector[Vector[Point]], lowPoint: Point): Set[Point] = {
+  def getBasin(input: Vector[Vector[PointWithHeight]], lowPoint: PointWithHeight): Set[PointWithHeight] = {
     @tailrec
-    def findBasin(startingPoint: Point, basin: Set[Point], adjacents: Set[Point]): Set[Point] = {
-      val newAdjacents = getAdjacents(input, startingPoint).filter(_.height < 9) -- basin ++ adjacents
+    def findBasin(startingPoint: PointWithHeight, basin: Set[PointWithHeight], adjacents: Set[PointWithHeight]): Set[PointWithHeight] = {
+      val newAdjacents = startingPoint.getAdjacents(input).filter(_.height < 9) -- basin ++ adjacents
       newAdjacents.headOption match {
         case Some(a) => findBasin(a, basin, newAdjacents.tail)
         case _ => basin + startingPoint
       }
     }
-    findBasin(lowPoint, Set(), getAdjacents(input, lowPoint).filter(_.height < 9))
+    findBasin(lowPoint, Set(), lowPoint.getAdjacents(input).filter(_.height < 9))
   }
 
-  def getLargestBasinSizes(input: Vector[Vector[Point]]): Int = {
+  def getLargestBasinSizes(input: Vector[Vector[PointWithHeight]]): Int = {
     getLowPoints(input).map(getBasin(input, _).size).sortBy(- _).take(3).product
   }
 
