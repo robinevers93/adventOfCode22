@@ -4,18 +4,19 @@ import scala.io.{BufferedSource, Source}
 
 object ReadInTestData {
 
-  def getPuzzleInput[T](transform: String => T)(filename: String): List[T] = {
-    val bufferedSource: BufferedSource = Source.fromFile(filename)
-    val puzzleAsList: List[T] = bufferedSource.getLines.toList.map(transform)
+  def getPuzzleInput(filename: String): String = {
+    val bufferedSource = Source.fromFile(filename)
+    val puzzleAsString = bufferedSource.mkString.trim
     bufferedSource.close
-    puzzleAsList
+    puzzleAsString
   }
-
-  def getPuzzleInputAsVector[T](transform: String => T)(filename: String): Vector[T] = {
-    val bufferedSource: BufferedSource = Source.fromFile(filename)
-    val puzzleAsList: Vector[T] = bufferedSource.getLines.toVector.map(transform)
-    bufferedSource.close
-    puzzleAsList
-  }
-
+  
+  def getPuzzleInputAsList(filename: String)(splitter: String): List[String] =
+    getPuzzleInput(filename).split(splitter).toList
+  
+  def getPuzzleInputAsFormattedList[T](transform: String => T)(filename: String)(splitter: String): List[T] =
+    getPuzzleInputAsList(filename)(splitter).map(transform)
+    
+  def getListsPuzzleInputAsFormattedLists[T](transform: String => T)(filename: String)(splitter: String): List[List[T]] =
+    getPuzzleInputAsList(filename)(splitter).map(_.linesIterator.map(transform(_)).toList)
 }
