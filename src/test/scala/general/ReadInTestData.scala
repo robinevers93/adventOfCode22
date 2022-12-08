@@ -6,7 +6,7 @@ object ReadInTestData {
 
   def getPuzzleInput(filename: String): String = {
     val bufferedSource = Source.fromFile(filename)
-    val puzzleAsString = bufferedSource.mkString.trim
+    val puzzleAsString = bufferedSource.mkString
     bufferedSource.close
     puzzleAsString
   }
